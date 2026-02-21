@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Run With 3H - AI를 활용한 러닝 훈련일지 및 커뮤니티</title>
+  <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.development.js"></script>
+  <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.development.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+  <script>
+    // Babel 경고 메시지 숨김
+    console.warn = function() {};
+  </script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans KR', sans-serif; background: #f5f7fa; color: #1a202c; }
+    .container { max-width: 480px; margin: 0 auto; background: white; min-height: 100vh; box-shadow: 0 0 20px rgba(0,0,0,0.1); }
+    .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; color: white; position: relative; min-height: 80px; }
+    .header h1 { font-size: 24px; font-weight: 700; margin-bottom: 5px; }
+    .header p { font-size: 14px; opacity: 0.9; }
+    .header-icons { position: absolute; top: 20px; right: 20px; display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
+    .icon-btn { padding: 8px 16px; background: rgba(255, 255, 255, 0.2); border: none; border-radius: 6px; color: white; font-size: 13px; cursor: pointer; transition: all 0.3s; white-space: nowrap; }
+    .icon-btn:hover { background: rgba(255, 255, 255, 0.3); transform: scale(1.05); }
+    .auth-container { max-width: 400px; margin: 0 auto; padding: 40px 20px; }
+    .auth-logo { text-align: center; margin-bottom: 40px; }
+    .auth-logo h1 { font-size: 36px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 8px; }
+    .auth-logo p { color: #718096; font-size: 14px; }
+    .auth-tabs { display: flex; gap: 8px; margin-bottom: 24px; }
+    .auth-tab { flex: 1; padding: 12px; border: none; background: #f7fafc; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; color: #718096; transition: all 0.3s; }
+    .auth-tab.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+    .form-group { margin-bottom: 16px; }
+    .form-label { display: block; font-size: 14px; font-weight: 500; margin-bottom: 8px; color: #4a5568; }
+    .form-input { width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; transition: border 0.3s; }
+    .form-input:focus { outline: none; border-color: #667eea; }
+    .form-input.error { border-color: #e53e3e; }
+    .error-message { color: #e53e3e; font-size: 12px; margin-top: 4px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .btn { padding: 12px 24px; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s; }
+    .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; width: 100%; }
+    .btn-primary:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4); }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-secondary { background: #48bb78; color: white; width: 100%; }
+    .btn-secondary:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(72, 187, 120, 0.4); }
+    .btn-download { background: #4299e1; color: white; margin-top: 12px; width: 100%; }
+    .text-link { color: #667eea; cursor: pointer; font-size: 13px; margin-top: 12px; display: inline-block; }
+    .text-link:hover { text-decoration: underline; }
+    .admin-panel { background: #fff5e6; border: 2px solid #ed8936; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+    .user-table { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 13px; }
+    .user-table th, .user-table td { padding: 8px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+    .user-table th { background: #f7fafc; font-weight: 600; color: #4a5568; }
+    .nav-bar { display: flex; background: white; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 100; }
+    .nav-item { flex: 1; padding: 16px; text-align: center; cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.3s; font-size: 14px; font-weight: 500; color: #718096; }
+    .nav-item.active { color: #667eea; border-bottom-color: #667eea; }
+    .page-content { padding: 20px; padding-bottom: 80px; }
+    .section { background: white; border-radius: 12px; padding: 20px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .section-title { font-size: 18px; font-weight: 600; margin-bottom: 16px; color: #2d3748; }
+    .progress-bar { height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden; margin-bottom: 8px; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); transition: width 0.3s; }
+    .progress-text { font-size: 12px; color: #718096; text-align: right; }
+    .record-input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+    .record-input-item { text-align: center; }
+    .record-input-item label { display: block; font-size: 12px; color: #718096; margin-bottom: 4px; }
+    .record-input-item input { width: 100%; padding: 8px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 13px; text-align: center; }
+    .info-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #e2e8f0; }
+    .info-row:last-child { border-bottom: none; }
+    .info-label { font-size: 14px; color: #718096; }
+    .info-value { font-size: 14px; font-weight: 600; color: #2d3748; }
+    .summary-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+    .summary-title { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+    .summary-subtitle { font-size: 14px; opacity: 0.9; }
+    .stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 16px; }
+    .stat-card { background: #f7fafc; padding: 16px; border-radius: 8px; text-align: center; }
+    .stat-value { font-size: 24px; font-weight: 700; color: #667eea; margin-bottom: 4px; }
+    .stat-label { font-size: 12px; color: #718096; }
+    .feed-card { background: white; border-radius: 12px; padding: 16px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .feed-header { display: flex; align-items: center; margin-bottom: 12px; }
+    .feed-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; margin-right: 12px; }
+    .feed-user-info { flex: 1; }
+    .feed-username { font-weight: 600; font-size: 14px; color: #2d3748; }
+    .feed-time { font-size: 12px; color: #a0aec0; }
+    .feed-image { width: 100%; height: 200px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; margin-bottom: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; }
+    .feed-stat { font-size: 32px; font-weight: 700; z-index: 1; }
+    .feed-stat-label { font-size: 14px; opacity: 0.9; z-index: 1; }
+    .feed-content { font-size: 14px; line-height: 1.6; color: #4a5568; margin-bottom: 12px; }
+    .tag { display: inline-block; padding: 4px 12px; background: #edf2f7; color: #667eea; border-radius: 12px; font-size: 12px; font-weight: 500; margin-right: 8px; margin-top: 8px; }
+    .feed-stats { display: flex; gap: 16px; padding: 12px 0; border-top: 1px solid #e2e8f0; font-size: 13px; color: #718096; }
+    .empty-state { text-align: center; padding: 40px 20px; color: #a0aec0; }
+    .empty-icon { font-size: 48px; margin-bottom: 12px; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState } = React;
+
+    const getStorage = (key, def) => {
+      try { return JSON.parse(localStorage.getItem(key)) || def; } catch { return def; }
+    };
+    const setStorage = (key, val) => localStorage.setItem(key, JSON.stringify(val));
+
+    function App() {
+      const [user, setUser] = useState(() => getStorage('currentUser', null));
+      const [isLoggedIn, setIsLoggedIn] = useState(() => getStorage('isLoggedIn', false));
+
+      const logout = () => {
+        setUser(null);
+        setIsLoggedIn(false);
+        setStorage('isLoggedIn', false);
+        setStorage('currentUser', null);
+      };
+
+      if (!isLoggedIn) return <AuthPage setUser={setUser} setIsLoggedIn={setIsLoggedIn} />;
+      return <MainApp user={user} logout={logout} />;
+    }
+
+    function AuthPage({ setUser, setIsLoggedIn }) {
+      const [mode, setMode] = useState('login');
+      const [loginData, setLoginData] = useState({ userId: '', password: '' });
+      const [signupData, setSignupData] = useState({
+        name: '', phone: '', email: '', userId: '', password: '', passwordConfirm: '', birthDate: ''
+      });
+      const [errors, setErrors] = useState({});
+      const [emailVerified, setEmailVerified] = useState(false);
+      const [verificationCode, setVerificationCode] = useState('');
+      const [codeSent, setCodeSent] = useState(false);
+      const [sendingCode, setSendingCode] = useState(false);
+      const [verifyingCode, setVerifyingCode] = useState(false);
+
+      const API_URL = window.location.origin; // 동일 서버에서 API 호출
+      const USE_LOCAL_MODE = false; // 실제 이메일 발송 모드
+
+      const sendVerificationCode = async () => {
+        if (!signupData.email) {
+          setErrors({...errors, email: '이메일을 먼저 입력해주세요'});
+          return;
+        }
+        if (!/\S+@\S+\.\S+/.test(signupData.email)) {
+          setErrors({...errors, email: '유효한 이메일을 입력해주세요'});
+          return;
+        }
+
+        setSendingCode(true);
+
+        // 로컬 테스트 모드
+        if (USE_LOCAL_MODE) {
+          setTimeout(() => {
+            const mockCode = Math.floor(100000 + Math.random() * 900000).toString();
+            console.log('========================================');
+            console.log('📧 이메일 인증 코드 (테스트 모드)');
+            console.log('이메일:', signupData.email);
+            console.log('인증 코드:', mockCode);
+            console.log('========================================');
+            
+            // 테스트용 코드 저장
+            setStorage('testVerificationCode', { email: signupData.email, code: mockCode });
+            
+            setCodeSent(true);
+            setSendingCode(false);
+            alert(`인증 코드가 발송되었습니다.\n\n테스트 모드: 콘솔(F12)에서 인증 코드를 확인하세요.\n\n인증 코드: ${mockCode}`);
+          }, 1000);
+          return;
+        }
+
+        // 실제 백엔드 모드
+        try {
+          const response = await fetch(`${API_URL}/api/send-verification`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: signupData.email })
+          });
+          const data = await response.json();
+          
+          if (response.ok) {
+            setCodeSent(true);
+            alert('인증 코드가 이메일로 발송되었습니다. 메일함을 확인해주세요.');
+          } else {
+            alert(data.error || '인증 코드 발송에 실패했습니다');
+          }
+        } catch (error) {
+          console.error('백엔드 연결 에러:', error);
+          alert('백엔드 서버에 연결할 수 없습니다.\n\n해결 방법:\n1. backend 폴더에서 "npm install" 실행\n2. "npm start"로 서버 실행\n3. http://localhost:3000/health 접속 확인\n\n또는 HTML 파일에서 USE_LOCAL_MODE = true로 설정하여 테스트 모드 사용');
+        }
+        setSendingCode(false);
+      };
+
+      const verifyEmailCode = async () => {
+        if (!verificationCode) {
+          alert('인증 코드를 입력해주세요');
+          return;
+        }
+
+        setVerifyingCode(true);
+
+        // 로컬 테스트 모드
+        if (USE_LOCAL_MODE) {
+          setTimeout(() => {
+            const stored = getStorage('testVerificationCode', null);
+            if (stored && stored.email === signupData.email && stored.code === verificationCode) {
+              setEmailVerified(true);
+              alert('이메일 인증이 완료되었습니다! ✅');
+            } else {
+              alert('인증 코드가 일치하지 않습니다');
+            }
+            setVerifyingCode(false);
+          }, 500);
+          return;
+        }
+
+        // 실제 백엔드 모드
+        try {
+          const response = await fetch(`${API_URL}/api/verify-code`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: signupData.email, code: verificationCode })
+          });
+          const data = await response.json();
+          
+          if (response.ok) {
+            setEmailVerified(true);
+            alert('이메일 인증이 완료되었습니다! ✅');
+          } else {
+            alert(data.error || '인증 코드가 일치하지 않습니다');
+          }
+        } catch (error) {
+          alert('서버 연결에 실패했습니다');
+          console.error(error);
+        }
+        setVerifyingCode(false);
+      };
+
+      const validateSignup = () => {
+        const err = {};
+        if (!signupData.name.trim()) err.name = '이름을 입력해주세요';
+        if (!signupData.phone.trim()) err.phone = '연락처를 입력해주세요';
+        if (!signupData.email.trim()) err.email = '이메일을 입력해주세요';
+        else if (!/\S+@\S+\.\S+/.test(signupData.email)) err.email = '유효한 이메일을 입력해주세요';
+        if (!emailVerified) err.email = '이메일 인증을 완료해주세요';
+        if (!signupData.userId.trim()) err.userId = '아이디를 입력해주세요';
+        if (!signupData.password) err.password = '비밀번호를 입력해주세요';
+        else if (signupData.password.length < 6) err.password = '비밀번호는 6자 이상이어야 합니다';
+        if (signupData.password !== signupData.passwordConfirm) err.passwordConfirm = '비밀번호가 일치하지 않습니다';
+        if (!signupData.birthDate) err.birthDate = '생년월일을 선택해주세요';
+        setErrors(err);
+        return Object.keys(err).length === 0;
+      };
+
+      const handleSignup = () => {
+        if (!validateSignup()) return;
+        const users = getStorage('users', []);
+        if (users.find(u => u.userId === signupData.userId)) {
+          setErrors({ userId: '이미 사용 중인 아이디입니다' });
+          return;
+        }
+        if (users.find(u => u.email === signupData.email)) {
+          setErrors({ email: '이미 가입된 이메일입니다' });
+          return;
+        }
+        const newUser = { id: Date.now(), ...signupData, createdAt: new Date().toISOString() };
+        delete newUser.passwordConfirm;
+        users.push(newUser);
+        setStorage('users', users);
+        alert('회원가입이 완료되었습니다!');
+        setMode('login');
+        setSignupData({ name: '', phone: '', email: '', userId: '', password: '', passwordConfirm: '', birthDate: '' });
+        setErrors({});
+        setEmailVerified(false);
+        setCodeSent(false);
+        setVerificationCode('');
+      };
+
+      const handleLogin = () => {
+        const users = getStorage('users', []);
+        
+        if (users.length === 0) {
+          alert('회원가입된 정보가 없습니다. 먼저 회원가입을 해주세요.');
+          setMode('signup');
+          return;
+        }
+        
+        const user = users.find(u => u.userId === loginData.userId && u.password === loginData.password);
+        if (user) {
+          alert('로그인이 되었습니다.');
+          setUser(user);
+          setIsLoggedIn(true);
+          setStorage('isLoggedIn', true);
+          setStorage('currentUser', user);
+        } else {
+          alert('아이디 또는 비밀번호가 올바르지 않습니다');
+        }
+      };
+
+      if (mode === 'admin') return <AdminPanel onBack={() => setMode('login')} />;
+
+      return (
+        <div className="auth-container">
+          <div className="auth-logo">
+            <h1>🏃 Run With 3H</h1>
+            <p>AI를 활용한 러닝 훈련일지 및 커뮤니티</p>
+          </div>
+          <div className="auth-tabs">
+            <button className={`auth-tab ${mode === 'login' ? 'active' : ''}`} onClick={() => setMode('login')}>로그인</button>
+            <button className={`auth-tab ${mode === 'signup' ? 'active' : ''}`} onClick={() => setMode('signup')}>회원가입</button>
+          </div>
+
+          {mode === 'login' ? (
+            <div>
+              <div className="form-group">
+                <label className="form-label">아이디</label>
+                <input className="form-input" value={loginData.userId} onChange={(e) => setLoginData({...loginData, userId: e.target.value})} onKeyPress={(e) => e.key === 'Enter' && handleLogin()} />
+              </div>
+              <div className="form-group">
+                <label className="form-label">비밀번호</label>
+                <input type="password" className="form-input" value={loginData.password} onChange={(e) => setLoginData({...loginData, password: e.target.value})} onKeyPress={(e) => e.key === 'Enter' && handleLogin()} />
+              </div>
+              <button className="btn btn-primary" onClick={handleLogin}>로그인</button>
+              <a className="text-link" onClick={() => setMode('admin')}>관리자 페이지</a>
+            </div>
+          ) : (
+            <div>
+              <div className="form-group">
+                <label className="form-label">이름</label>
+                <input className={`form-input ${errors.name ? 'error' : ''}`} value={signupData.name} onChange={(e) => setSignupData({...signupData, name: e.target.value})} />
+                {errors.name && <div className="error-message">{errors.name}</div>}
+              </div>
+              <div className="form-group">
+                <label className="form-label">연락처</label>
+                <input type="tel" className={`form-input ${errors.phone ? 'error' : ''}`} placeholder="010-0000-0000" value={signupData.phone} onChange={(e) => setSignupData({...signupData, phone: e.target.value})} />
+                {errors.phone && <div className="error-message">{errors.phone}</div>}
+              </div>
+              <div className="form-group">
+                <label className="form-label">이메일주소 {emailVerified && <span style={{color: '#48bb78', fontSize: '12px'}}>✓ 인증완료</span>}</label>
+                <div style={{display: 'flex', gap: '8px'}}>
+                  <input type="email" className={`form-input ${errors.email ? 'error' : ''}`} placeholder="example@email.com" value={signupData.email} onChange={(e) => { setSignupData({...signupData, email: e.target.value}); setEmailVerified(false); setCodeSent(false); }} disabled={emailVerified} style={{flex: 1}} />
+                  <button className="btn btn-secondary" onClick={sendVerificationCode} disabled={sendingCode || emailVerified} style={{width: 'auto', padding: '12px 16px', whiteSpace: 'nowrap'}}>
+                    {sendingCode ? '발송 중...' : emailVerified ? '인증완료' : '인증코드 발송'}
+                  </button>
+                </div>
+                {errors.email && <div className="error-message">{errors.email}</div>}
+              </div>
+              {codeSent && !emailVerified && (
+                <div className="form-group">
+                  <label className="form-label">인증 코드 (이메일 확인)</label>
+                  <div style={{display: 'flex', gap: '8px'}}>
+                    <input className="form-input" placeholder="6자리 코드 입력" value={verificationCode} onChange={(e) => setVerificationCode(e.target.value)} maxLength="6" style={{flex: 1}} />
+                    <button className="btn btn-secondary" onClick={verifyEmailCode} disabled={verifyingCode} style={{width: 'auto', padding: '12px 16px', whiteSpace: 'nowrap'}}>
+                      {verifyingCode ? '확인 중...' : '확인'}
+                    </button>
+                  </div>
+                  <div style={{fontSize: '12px', color: '#718096', marginTop: '4px'}}>10분 이내에 입력해주세요</div>
+                </div>
+              )}
+              <div className="form-group">
+                <label className="form-label">아이디</label>
+                <input className={`form-input ${errors.userId ? 'error' : ''}`} value={signupData.userId} onChange={(e) => setSignupData({...signupData, userId: e.target.value})} />
+                {errors.userId && <div className="error-message">{errors.userId}</div>}
+              </div>
+              <div className="form-group">
+                <label className="form-label">비밀번호</label>
+                <input type="password" className={`form-input ${errors.password ? 'error' : ''}`} value={signupData.password} onChange={(e) => setSignupData({...signupData, password: e.target.value})} />
+                {errors.password && <div className="error-message">{errors.password}</div>}
+              </div>
+              <div className="form-group">
+                <label className="form-label">비밀번호 확인</label>
+                <input type="password" className={`form-input ${errors.passwordConfirm ? 'error' : ''}`} value={signupData.passwordConfirm} onChange={(e) => setSignupData({...signupData, passwordConfirm: e.target.value})} />
+                {errors.passwordConfirm && <div className="error-message">{errors.passwordConfirm}</div>}
+              </div>
+              <div className="form-group">
+                <label className="form-label">생년월일</label>
+                <input type="date" className={`form-input ${errors.birthDate ? 'error' : ''}`} value={signupData.birthDate} onChange={(e) => setSignupData({...signupData, birthDate: e.target.value})} />
+                {errors.birthDate && <div className="error-message">{errors.birthDate}</div>}
+              </div>
+              <button className="btn btn-primary" onClick={handleSignup}>회원가입</button>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    function AdminPanel({ onBack }) {
+      const users = getStorage('users', []);
+
+      const downloadCSV = () => {
+        const headers = ['ID', '이름', '연락처', '이메일', '아이디', '생년월일', '가입일'];
+        const rows = users.map(u => [u.id, u.name, u.phone, u.email, u.userId, u.birthDate, new Date(u.createdAt).toLocaleString('ko-KR')]);
+        const csv = [headers.join(','), ...rows.map(r => r.map(c => `"${c}"`).join(','))].join('\n');
+        const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `회원데이터_${new Date().toISOString().split('T')[0]}.csv`;
+        link.click();
+      };
+
+      return (
+        <div className="auth-container">
+          <div className="admin-panel">
+            <div style={{fontSize: '18px', fontWeight: '600', marginBottom: '12px', color: '#ed8936'}}>👨‍💼 관리자 페이지</div>
+            <p style={{fontSize: '14px', color: '#718096', marginBottom: '12px'}}>총 {users.length}명의 회원이 가입되어 있습니다.</p>
+            <button className="btn btn-download" onClick={downloadCSV}>📥 CSV 다운로드</button>
+          </div>
+          {users.length > 0 && (
+            <div className="section">
+              <h3 className="section-title">회원 목록</h3>
+              <div style={{overflowX: 'auto'}}>
+                <table className="user-table">
+                  <thead><tr><th>이름</th><th>아이디</th><th>이메일</th><th>가입일</th></tr></thead>
+                  <tbody>{users.map(u => <tr key={u.id}><td>{u.name}</td><td>{u.userId}</td><td>{u.email}</td><td>{new Date(u.createdAt).toLocaleDateString('ko-KR')}</td></tr>)}</tbody>
+                </table>
+              </div>
+            </div>
+          )}
+          <a className="text-link" onClick={onBack}>← 로그인으로 돌아가기</a>
+        </div>
+      );
+    }
+
+    function MainApp({ user, logout }) {
+      const [page, setPage] = useState('profile');
+      const [showAccountInfo, setShowAccountInfo] = useState(false);
+
+      if (showAccountInfo) return <AccountInfoPage user={user} onBack={() => setShowAccountInfo(false)} />;
+
+      return (
+        <div className="container">
+          <div className="header">
+            <h1>🏃 Run With 3H</h1>
+            <p>AI를 활용한 러닝 훈련일지 및 커뮤니티</p>
+            <div className="header-icons">
+              <button className="icon-btn" onClick={() => setShowAccountInfo(true)}>👤 내 프로필</button>
+              <button className="icon-btn" onClick={logout}>🚪 로그아웃</button>
+            </div>
+          </div>
+          <div className="nav-bar">
+            <div className={`nav-item ${page === 'profile' ? 'active' : ''}`} onClick={() => setPage('profile')}>프로필</div>
+            <div className={`nav-item ${page === 'training' ? 'active' : ''}`} onClick={() => setPage('training')}>훈련</div>
+            <div className={`nav-item ${page === 'community' ? 'active' : ''}`} onClick={() => setPage('community')}>커뮤니티</div>
+          </div>
+          <div className="page-content">
+            {page === 'profile' && <ProfilePage userId={user.id} />}
+            {page === 'training' && <TrainingPage userId={user.id} />}
+            {page === 'community' && <CommunityPage userId={user.id} />}
+          </div>
+        </div>
+      );
+    }
+
+    function AccountInfoPage({ user, onBack }) {
+      const [selectedMonth, setSelectedMonth] = useState(new Date());
+      const [selectedDate, setSelectedDate] = useState(null);
+      const workouts = getStorage(`workouts_${user.id}`, []);
+
+      const changeMonth = (delta) => {
+        const newMonth = new Date(selectedMonth);
+        newMonth.setMonth(newMonth.getMonth() + delta);
+        setSelectedMonth(newMonth);
+        setSelectedDate(null);
+      };
+
+      const getDaysInMonth = () => {
+        const year = selectedMonth.getFullYear();
+        const month = selectedMonth.getMonth();
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        
+        const days = [];
+        for (let i = 0; i < firstDay; i++) {
+          days.push(null);
+        }
+        for (let i = 1; i <= daysInMonth; i++) {
+          days.push(i);
+        }
+        return days;
+      };
+
+      const hasWorkout = (day) => {
+        if (!day) return false;
+        const dateStr = `${selectedMonth.getFullYear()}-${String(selectedMonth.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        return workouts.find(log => log.date === dateStr);
+      };
+
+      const selectedWorkout = selectedDate ? hasWorkout(selectedDate) : null;
+
+      return (
+        <div className="container">
+          <div className="header">
+            <h1>👤 내 프로필</h1>
+            <p>계정 정보</p>
+          </div>
+          <div className="page-content">
+            <div className="summary-card">
+              <div className="summary-title">{user.name}님의 계정</div>
+              <div className="summary-subtitle">Run With 3H 회원</div>
+            </div>
+            <div className="section">
+              <h2 className="section-title">📋 회원 정보</h2>
+              <div className="info-row">
+                <div className="info-label">이름</div>
+                <div className="info-value">{user.name}</div>
+              </div>
+              <div className="info-row">
+                <div className="info-label">아이디</div>
+                <div className="info-value">{user.userId}</div>
+              </div>
+              <div className="info-row">
+                <div className="info-label">이메일</div>
+                <div className="info-value">{user.email}</div>
+              </div>
+              <div className="info-row">
+                <div className="info-label">연락처</div>
+                <div className="info-value">{user.phone}</div>
+              </div>
+              <div className="info-row">
+                <div className="info-label">생년월일</div>
+                <div className="info-value">{user.birthDate}</div>
+              </div>
+              <div className="info-row">
+                <div className="info-label">가입일</div>
+                <div className="info-value">{new Date(user.createdAt).toLocaleDateString('ko-KR')}</div>
+              </div>
+            </div>
+
+            <div className="section">
+              <h2 className="section-title">📅 훈련 캘린더</h2>
+              <div style={{marginTop: '20px'}}>
+                <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px'}}>
+                  <div style={{fontSize: '16px', fontWeight: '600', color: '#2d3748'}}>
+                    {selectedMonth.getFullYear()}년 {selectedMonth.getMonth() + 1}월
+                  </div>
+                  <div style={{display: 'flex', gap: '8px'}}>
+                    <button style={{padding: '4px 12px', background: '#edf2f7', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '14px', color: '#4a5568'}} onClick={() => changeMonth(-1)}>◀</button>
+                    <button style={{padding: '4px 12px', background: '#edf2f7', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '14px', color: '#4a5568'}} onClick={() => changeMonth(1)}>▶</button>
+                  </div>
+                </div>
+
+                <div style={{display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '4px'}}>
+                  {['일', '월', '화', '수', '목', '금', '토'].map(day => (
+                    <div key={day} style={{textAlign: 'center', fontSize: '12px', fontWeight: '600', color: '#718096', padding: '8px 4px'}}>{day}</div>
+                  ))}
+                  {getDaysInMonth().map((day, index) => {
+                    const workout = hasWorkout(day);
+                    return (
+                      <div 
+                        key={index} 
+                        style={{
+                          aspectRatio: '1',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          borderRadius: '8px',
+                          background: !day ? 'transparent' : workout ? '#48bb78' : '#f7fafc',
+                          fontSize: '14px',
+                          cursor: day ? 'pointer' : 'default',
+                          transition: 'all 0.3s',
+                          color: workout ? 'white' : '#2d3748',
+                          fontWeight: workout ? '600' : 'normal',
+                          border: selectedDate === day ? '2px solid #667eea' : '2px solid transparent'
+                        }}
+                        onClick={() => day && setSelectedDate(day)}
+                        onMouseEnter={(e) => day && !workout && (e.target.style.background = '#edf2f7')}
+                        onMouseLeave={(e) => day && !workout && (e.target.style.background = '#f7fafc')}
+                      >
+                        {day}
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {selectedWorkout && (
+                  <div style={{background: 'white', borderRadius: '12px', padding: '20px', marginTop: '16px', boxShadow: '0 4px 12px rgba(0,0,0,0.15)'}}>
+                    <div style={{textAlign: 'right', marginBottom: '12px'}}>
+                      <button style={{background: 'none', border: 'none', fontSize: '24px', cursor: 'pointer', color: '#718096'}} onClick={() => setSelectedDate(null)}>×</button>
+                    </div>
+                    <h3 style={{fontSize: '16px', fontWeight: '600', marginBottom: '12px'}}>
+                      {selectedMonth.getMonth() + 1}월 {selectedDate}일 훈련
+                    </h3>
+                    <div className="info-row">
+                      <div className="info-label">운동 유형</div>
+                      <div className="info-value">{selectedWorkout.workout.type}</div>
+                    </div>
+                    <div className="info-row">
+                      <div className="info-label">거리</div>
+                      <div className="info-value">{selectedWorkout.distance}km</div>
+                    </div>
+                    <div className="info-row">
+                      <div className="info-label">시간</div>
+                      <div className="info-value">{selectedWorkout.time}분</div>
+                    </div>
+                    {selectedWorkout.avgHr && (
+                      <div className="info-row">
+                        <div className="info-label">평균 심박수</div>
+                        <div className="info-value">{selectedWorkout.avgHr}bpm</div>
+                      </div>
+                    )}
+                    {selectedWorkout.avgCadence && (
+                      <div className="info-row">
+                        <div className="info-label">평균 케이던스</div>
+                        <div className="info-value">{selectedWorkout.avgCadence}spm</div>
+                      </div>
+                    )}
+                    <div className="info-row">
+                      <div className="info-label">체감 난이도</div>
+                      <div className="info-value">{"⭐".repeat(Math.ceil(selectedWorkout.rpe / 2))}</div>
+                    </div>
+                    <div className="info-row">
+                      <div className="info-label">달성률</div>
+                      <div className="info-value" style={{color: selectedWorkout.achievement >= 80 ? '#48bb78' : '#ed8936'}}>
+                        {selectedWorkout.achievement}%
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="section">
+              <button className="btn btn-primary" onClick={onBack}>← 돌아가기</button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    function ProfilePage({ userId }) {
+      const [profile, setProfile] = useState(() => getStorage(`profile_${userId}`, { age: '', height: '', weight: '', weeklyRuns: 4 }));
+      const [records, setRecords] = useState(() => getStorage(`records_${userId}`, { '5k': { minutes: '', seconds: '' }, '10k': { minutes: '', seconds: '' } }));
+      const [goal, setGoal] = useState(() => getStorage(`goal_${userId}`, { eventType: '10k', targetMinutes: '', targetSeconds: '', targetDate: '' }));
+      const [profileSaved, setProfileSaved] = useState(() => getStorage(`profileSaved_${userId}`, false));
+
+      const calculateProgress = () => {
+        let filled = 0;
+        if (profile.age) filled++;
+        if (profile.height) filled++;
+        if (profile.weight) filled++;
+        if (records['5k'].minutes || records['10k'].minutes) filled++;
+        if (goal.eventType) filled++;
+        if (goal.targetMinutes) filled++;
+        if (goal.targetDate) filled++;
+        return Math.round((filled / 7) * 100);
+      };
+
+      const save = () => {
+        setStorage(`profile_${userId}`, profile);
+        setStorage(`records_${userId}`, records);
+        setStorage(`goal_${userId}`, goal);
+        setStorage(`profileSaved_${userId}`, true);
+        setProfileSaved(true);
+        alert('프로필이 저장되었습니다! 🎉');
+      };
+
+      const progress = calculateProgress();
+
+      return (
+        <>
+          <div className="section">
+            <div className="progress-bar">
+              <div className="progress-fill" style={{width: `${progress}%`}}></div>
+            </div>
+            <div className="progress-text">입력 진행률: {progress}%</div>
+          </div>
+
+          <div className="section">
+            <h2 className="section-title">📊 신체 정보</h2>
+            <div className="form-row">
+              <div className="form-group">
+                <label className="form-label">나이</label>
+                <input type="number" className="form-input" placeholder="25" value={profile.age} onChange={(e) => setProfile({...profile, age: e.target.value})} />
+              </div>
+              <div className="form-group">
+                <label className="form-label">주간 훈련</label>
+                <select className="form-input" value={profile.weeklyRuns} onChange={(e) => setProfile({...profile, weeklyRuns: e.target.value})}>
+                  <option value="3">주 3회</option>
+                  <option value="4">주 4회</option>
+                  <option value="5">주 5회</option>
+                  <option value="6">주 6회</option>
+                </select>
+              </div>
+            </div>
+            <div className="form-row">
+              <div className="form-group">
+                <label className="form-label">키 (cm)</label>
+                <input type="number" className="form-input" placeholder="170" value={profile.height} onChange={(e) => setProfile({...profile, height: e.target.value})} />
+              </div>
+              <div className="form-group">
+                <label className="form-label">몸무게 (kg)</label>
+                <input type="number" className="form-input" placeholder="65" value={profile.weight} onChange={(e) => setProfile({...profile, weight: e.target.value})} />
+              </div>
+            </div>
+          </div>
+
+          <div className="section">
+            <h2 className="section-title">⏱️ 현재 기록</h2>
+            <div className="form-group">
+              <label className="form-label">5K 기록</label>
+              <div className="record-input-grid">
+                <div className="record-input-item">
+                  <label>분</label>
+                  <input type="number" placeholder="25" value={records['5k'].minutes} onChange={(e) => setRecords({...records, '5k': {...records['5k'], minutes: e.target.value}})} />
+                </div>
+                <div className="record-input-item">
+                  <label>초</label>
+                  <input type="number" placeholder="30" value={records['5k'].seconds} onChange={(e) => setRecords({...records, '5k': {...records['5k'], seconds: e.target.value}})} />
+                </div>
+              </div>
+            </div>
+            <div className="form-group">
+              <label className="form-label">10K 기록</label>
+              <div className="record-input-grid">
+                <div className="record-input-item">
+                  <label>분</label>
+                  <input type="number" placeholder="52" value={records['10k'].minutes} onChange={(e) => setRecords({...records, '10k': {...records['10k'], minutes: e.target.value}})} />
+                </div>
+                <div className="record-input-item">
+                  <label>초</label>
+                  <input type="number" placeholder="00" value={records['10k'].seconds} onChange={(e) => setRecords({...records, '10k': {...records['10k'], seconds: e.target.value}})} />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="section">
+            <h2 className="section-title">🎯 목표 설정</h2>
+            <div className="form-group">
+              <label className="form-label">목표 종목</label>
+              <select className="form-input" value={goal.eventType} onChange={(e) => setGoal({...goal, eventType: e.target.value})}>
+                <option value="5k">5K</option>
+                <option value="10k">10K</option>
+                <option value="half">하프 마라톤</option>
+                <option value="full">풀 마라톤</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label className="form-label">목표 기록</label>
+              <div className="record-input-grid">
+                <div className="record-input-item">
+                  <label>분</label>
+                  <input type="number" placeholder="50" value={goal.targetMinutes} onChange={(e) => setGoal({...goal, targetMinutes: e.target.value})} />
+                </div>
+                <div className="record-input-item">
+                  <label>초</label>
+                  <input type="number" placeholder="00" value={goal.targetSeconds} onChange={(e) => setGoal({...goal, targetSeconds: e.target.value})} />
+                </div>
+              </div>
+            </div>
+            <div className="form-group">
+              <label className="form-label">목표 날짜</label>
+              <input type="date" className="form-input" value={goal.targetDate} onChange={(e) => setGoal({...goal, targetDate: e.target.value})} />
+            </div>
+          </div>
+
+          <div className="section">
+            <button className="btn btn-primary" onClick={save} disabled={progress < 100}>
+              {profileSaved ? '저장됨 ✓' : `저장 ${progress < 100 ? `(${progress}%)` : ''}`}
+            </button>
+          </div>
+        </>
+      );
+    }
+
+    function TrainingPage({ userId }) {
+      const [viewMode, setViewMode] = useState('week');
+      const [currentPeriod, setCurrentPeriod] = useState(new Date());
+      const [selectedDay, setSelectedDay] = useState(0);
+      const [workouts, setWorkouts] = useState(() => getStorage(`workouts_${userId}`, []));
+      const [workoutInput, setWorkoutInput] = useState({ time: '', distance: '', avgHr: '', avgCadence: '', rpe: 5 });
+      const [originalWorkoutInput, setOriginalWorkoutInput] = useState(null);
+
+      const today = new Date();
+      const threeYearsAgo = new Date(today.getFullYear() - 3, today.getMonth(), today.getDate());
+      const threeYearsLater = new Date(today.getFullYear() + 3, today.getMonth(), today.getDate());
+
+      // 추천 운동 목록
+      const recommendedWorkouts = [
+        {
+          type: 'Easy Run',
+          distance: '5',
+          duration: '30분',
+          pace: '6:00 /km',
+          description: '편안한 페이스로 달리기. 대화가 가능한 강도',
+          tips: '처음이라면 걷기와 조깅을 번갈아가며 진행하세요'
+        },
+        {
+          type: 'Interval Training',
+          distance: '6',
+          duration: '40분',
+          pace: '5:00 /km',
+          description: '빠르게-천천히 반복 훈련',
+          tips: '빠른 구간에서는 80% 정도의 힘으로 달리세요'
+        },
+        {
+          type: 'Tempo Run',
+          distance: '8',
+          duration: '45분',
+          pace: '5:30 /km',
+          description: '약간 힘든 속도로 일정하게 달리기',
+          tips: '"적당히 힘들다"는 느낌이 들어야 합니다'
+        },
+        {
+          type: 'Long Run',
+          distance: '10',
+          duration: '65분',
+          pace: '6:30 /km',
+          description: '긴 거리 천천히 달리기',
+          tips: '목표는 거리가 아닌 시간입니다. 천천히 달리세요'
+        },
+        {
+          type: 'Recovery Run',
+          distance: '4',
+          duration: '25분',
+          pace: '6:15 /km',
+          description: '매우 가볍게 달리기',
+          tips: '피로 회복이 목적입니다. 최대한 천천히!'
+        }
+      ];
+
+      const changePeriod = (delta) => {
+        const newPeriod = new Date(currentPeriod);
+        if (viewMode === 'week') {
+          newPeriod.setDate(newPeriod.getDate() + (delta * 7));
+        } else {
+          newPeriod.setMonth(newPeriod.getMonth() + delta);
+        }
+        if (newPeriod >= threeYearsAgo && newPeriod <= threeYearsLater) {
+          setCurrentPeriod(newPeriod);
+          setSelectedDay(0);
+        }
+      };
+
+      const canGoPrev = () => {
+        const testDate = new Date(currentPeriod);
+        if (viewMode === 'week') testDate.setDate(testDate.getDate() - 7);
+        else testDate.setMonth(testDate.getMonth() - 1);
+        return testDate >= threeYearsAgo;
+      };
+
+      const canGoNext = () => {
+        const testDate = new Date(currentPeriod);
+        if (viewMode === 'week') testDate.setDate(testDate.getDate() + 7);
+        else testDate.setMonth(testDate.getMonth() + 1);
+        return testDate <= threeYearsLater;
+      };
+
+      const getPeriodTitle = () => {
+        if (viewMode === 'week') {
+          const weekStart = new Date(currentPeriod);
+          weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+          const weekEnd = new Date(weekStart);
+          weekEnd.setDate(weekEnd.getDate() + 6);
+          return `${weekStart.getMonth() + 1}/${weekStart.getDate()} - ${weekEnd.getMonth() + 1}/${weekEnd.getDate()}`;
+        } else {
+          return `${currentPeriod.getFullYear()}년 ${currentPeriod.getMonth() + 1}월`;
+        }
+      };
+
+      const getDaysToShow = () => {
+        if (viewMode === 'week') {
+          const result = [];
+          const start = new Date(currentPeriod);
+          start.setDate(start.getDate() - start.getDay());
+          for (let i = 0; i < 7; i++) {
+            const date = new Date(start);
+            date.setDate(date.getDate() + i);
+            result.push(date);
+          }
+          return result;
+        } else {
+          const year = currentPeriod.getFullYear();
+          const month = currentPeriod.getMonth();
+          const firstDay = new Date(year, month, 1);
+          const lastDay = new Date(year, month + 1, 0);
+          const result = [];
+          for (let i = 0; i < firstDay.getDay(); i++) result.push(null);
+          for (let i = 1; i <= lastDay.getDate(); i++) result.push(new Date(year, month, i));
+          return result;
+        }
+      };
+
+      const getDayLabel = (date) => {
+        if (!date) return '';
+        const days = ['일', '월', '화', '수', '목', '금', '토'];
+        return days[date.getDay()];
+      };
+
+      const getDateLabel = (date) => !date ? '' : date.getDate();
+      const getDateString = (date) => !date ? '' : date.toISOString().split('T')[0];
+
+      const isCompleted = (date) => {
+        if (!date) return false;
+        const dateStr = getDateString(date);
+        return workouts.some(log => log.date === dateStr);
+      };
+
+      const isToday = (date) => {
+        if (!date) return false;
+        const todayStr = new Date().toISOString().split('T')[0];
+        return getDateString(date) === todayStr;
+      };
+
+      const daysToShow = getDaysToShow();
+      const selectedDate = daysToShow[selectedDay];
+      const todayWorkout = recommendedWorkouts[selectedDay % recommendedWorkouts.length];
+
+      const isWorkoutInputComplete = () => workoutInput.distance && workoutInput.time;
+
+      const completeWorkout = () => {
+        if (!isWorkoutInputComplete()) {
+          alert('거리와 시간을 입력해주세요');
+          return;
+        }
+        if (!selectedDate) {
+          alert('날짜를 선택해주세요');
+          return;
+        }
+
+        const dateStr = getDateString(selectedDate);
+        const newLog = {
+          id: Date.now(),
+          workout: todayWorkout,
+          ...workoutInput,
+          date: dateStr,
+          achievement: Math.round((parseFloat(workoutInput.distance) / parseFloat(todayWorkout.distance)) * 100)
+        };
+
+        const updatedLogs = workouts.filter(log => log.date !== dateStr);
+        updatedLogs.unshift(newLog);
+        updatedLogs.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        setWorkouts(updatedLogs);
+        setStorage(`workouts_${userId}`, updatedLogs);
+        setOriginalWorkoutInput({...workoutInput});
+        alert('저장되었습니다.');
+      };
+
+      React.useEffect(() => {
+        if (selectedDate) {
+          const dateStr = getDateString(selectedDate);
+          const existingLog = workouts.find(log => log.date === dateStr);
+          if (existingLog) {
+            setWorkoutInput({
+              time: existingLog.time,
+              distance: existingLog.distance,
+              avgHr: existingLog.avgHr || '',
+              avgCadence: existingLog.avgCadence || '',
+              rpe: existingLog.rpe || 5
+            });
+            setOriginalWorkoutInput({
+              time: existingLog.time,
+              distance: existingLog.distance,
+              avgHr: existingLog.avgHr || '',
+              avgCadence: existingLog.avgCadence || '',
+              rpe: existingLog.rpe || 5
+            });
+          } else {
+            setWorkoutInput({ time: '', distance: '', avgHr: '', avgCadence: '', rpe: 5 });
+            setOriginalWorkoutInput(null);
+          }
+        }
+      }, [selectedDay, workouts, viewMode, currentPeriod]);
+
+      const isSaved = () => originalWorkoutInput !== null;
+      const isWorkoutInputModified = () => {
+        if (!originalWorkoutInput) return false;
+        return JSON.stringify(workoutInput) !== JSON.stringify(originalWorkoutInput);
+      };
+
+      return (
+        <>
+          <div className="section">
+            <h2 className="section-title">📅 훈련 일자</h2>
+            <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', padding: '12px', background: '#f7fafc', borderRadius: '8px'}}>
+              <div style={{display: 'flex', alignItems: 'center', gap: '12px'}}>
+                <button style={{width: '32px', height: '32px', border: 'none', background: 'white', borderRadius: '6px', cursor: 'pointer', fontSize: '16px'}} onClick={() => changePeriod(-1)} disabled={!canGoPrev()}>◀</button>
+                <div style={{fontSize: '16px', fontWeight: '600', minWidth: '120px', textAlign: 'center'}}>{getPeriodTitle()}</div>
+                <button style={{width: '32px', height: '32px', border: 'none', background: 'white', borderRadius: '6px', cursor: 'pointer', fontSize: '16px'}} onClick={() => changePeriod(1)} disabled={!canGoNext()}>▶</button>
+              </div>
+              <div style={{display: 'flex', gap: '8px'}}>
+                <button style={{padding: '6px 12px', border: viewMode === 'week' ? 'none' : '1px solid #e2e8f0', background: viewMode === 'week' ? '#667eea' : 'white', borderRadius: '6px', cursor: 'pointer', fontSize: '13px', color: viewMode === 'week' ? 'white' : '#4a5568'}} onClick={() => { setViewMode('week'); setCurrentPeriod(new Date()); setSelectedDay(0); }}>주</button>
+                <button style={{padding: '6px 12px', border: viewMode === 'month' ? 'none' : '1px solid #e2e8f0', background: viewMode === 'month' ? '#667eea' : 'white', borderRadius: '6px', cursor: 'pointer', fontSize: '13px', color: viewMode === 'month' ? 'white' : '#4a5568'}} onClick={() => { setViewMode('month'); setCurrentPeriod(new Date()); setSelectedDay(0); }}>월</button>
+              </div>
+            </div>
+            <p style={{fontSize: '13px', color: '#718096', marginBottom: '16px'}}>날짜를 선택하면 해당 일의 추천 훈련을 확인할 수 있습니다</p>
+            <div style={{display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '8px', marginBottom: '20px'}}>
+              {daysToShow.map((date, i) => {
+                if (!date) return <div key={i} style={{visibility: 'hidden'}}></div>;
+                return (
+                  <div key={i} onClick={() => setSelectedDay(i)} style={{textAlign: 'center', padding: '12px 4px', borderRadius: '8px', background: isToday(date) ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : isCompleted(date) ? '#48bb78' : '#f7fafc', color: isToday(date) || isCompleted(date) ? 'white' : '#1a202c', cursor: 'pointer', border: selectedDay === i ? '2px solid #667eea' : '2px solid transparent', fontWeight: isToday(date) ? '600' : 'normal'}}>
+                    <div style={{fontSize: '10px', marginBottom: '4px'}}>{getDayLabel(date)}</div>
+                    <div style={{fontSize: '14px', fontWeight: '600'}}>{getDateLabel(date)}</div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="section">
+            <h2 className="section-title">🎯 {selectedDate ? `${selectedDate.getMonth() + 1}/${selectedDate.getDate()}` : ''}의 추천 훈련</h2>
+            {todayWorkout && (
+              <div style={{background: 'linear-gradient(135deg, #f6f8fb 0%, #eef2f7 100%)', borderRadius: '12px', padding: '20px', marginTop: '16px', borderLeft: '4px solid #667eea'}}>
+                <div style={{fontSize: '18px', fontWeight: '700', color: '#2d3748', marginBottom: '12px'}}>{todayWorkout.type}</div>
+                <div style={{marginBottom: '16px'}}>
+                  <div style={{display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px'}}>
+                    <div style={{textAlign: 'center'}}>
+                      <div style={{fontSize: '12px', color: '#718096'}}>거리</div>
+                      <div style={{fontSize: '16px', fontWeight: '600', color: '#2d3748'}}>{todayWorkout.distance}km</div>
+                    </div>
+                    <div style={{textAlign: 'center'}}>
+                      <div style={{fontSize: '12px', color: '#718096'}}>시간</div>
+                      <div style={{fontSize: '16px', fontWeight: '600', color: '#2d3748'}}>{todayWorkout.duration}</div>
+                    </div>
+                    <div style={{textAlign: 'center'}}>
+                      <div style={{fontSize: '12px', color: '#718096'}}>페이스</div>
+                      <div style={{fontSize: '16px', fontWeight: '600', color: '#2d3748'}}>{todayWorkout.pace}</div>
+                    </div>
+                  </div>
+                </div>
+                <div style={{marginBottom: '8px'}}>
+                  <div style={{fontSize: '14px', fontWeight: '600', color: '#4a5568', marginBottom: '8px'}}>📝 훈련 설명</div>
+                  <p style={{fontSize: '13px', lineHeight: '1.6', color: '#718096'}}>{todayWorkout.description}</p>
+                </div>
+                <div>
+                  <div style={{fontSize: '14px', fontWeight: '600', color: '#4a5568', marginBottom: '8px'}}>💡 운동 팁</div>
+                  <p style={{fontSize: '13px', lineHeight: '1.6', color: '#718096'}}>{todayWorkout.tips}</p>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {selectedDate && (
+            <div className="section">
+              <h2 className="section-title">📊 수행 정보 입력</h2>
+              <div className="form-row">
+                <div className="form-group">
+                  <label className="form-label">거리 (km)</label>
+                  <input type="number" step="0.1" className="form-input" placeholder="5.0" value={workoutInput.distance} onChange={(e) => setWorkoutInput({...workoutInput, distance: e.target.value})} />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">시간 (분)</label>
+                  <input type="number" className="form-input" placeholder="30" value={workoutInput.time} onChange={(e) => setWorkoutInput({...workoutInput, time: e.target.value})} />
+                </div>
+              </div>
+              <div className="form-row">
+                <div className="form-group">
+                  <label className="form-label">평균 심박수 (선택)</label>
+                  <input type="number" className="form-input" placeholder="145" value={workoutInput.avgHr} onChange={(e) => setWorkoutInput({...workoutInput, avgHr: e.target.value})} />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">평균 케이던스 (선택)</label>
+                  <input type="number" className="form-input" placeholder="170" value={workoutInput.avgCadence} onChange={(e) => setWorkoutInput({...workoutInput, avgCadence: e.target.value})} />
+                </div>
+              </div>
+              <div className="form-group">
+                <label className="form-label">체감 난이도 (RPE 1-10)</label>
+                <input type="range" min="1" max="10" className="form-input" value={workoutInput.rpe || 5} onChange={(e) => setWorkoutInput({...workoutInput, rpe: e.target.value})} style={{padding: '0'}} />
+                <div style={{textAlign: 'center', fontSize: '18px', fontWeight: '600', color: '#667eea'}}>{workoutInput.rpe || 5} / 10</div>
+              </div>
+              {!isSaved() ? (
+                <button className="btn btn-primary" onClick={completeWorkout} disabled={!isWorkoutInputComplete()}>훈련 완료 (저장) 🎉</button>
+              ) : (
+                <button className="btn" style={{background: '#ed8936', color: 'white', width: '100%'}} onClick={completeWorkout} disabled={!isWorkoutInputModified()}>훈련 완료 (수정) ✏️</button>
+              )}
+            </div>
+          )}
+        </>
+      );
+    }
+
+    function CommunityPage({ userId }) {
+      const workouts = getStorage(`workouts_${userId}`, []);
+
+      if (workouts.length === 0) {
+        return (
+          <div className="empty-state">
+            <div className="empty-icon">🏃</div>
+            <p>아직 기록된 훈련이 없습니다.</p>
+            <p style={{fontSize: '14px', marginTop: '8px'}}>훈련을 완료하면 자동으로 피드가 생성됩니다!</p>
+          </div>
+        );
+      }
+
+      const totalDistance = workouts.reduce((sum, w) => sum + parseFloat(w.distance || 0), 0);
+      const totalTime = workouts.reduce((sum, w) => sum + parseFloat(w.time || 0), 0);
+
+      return (
+        <>
+          <div className="section">
+            <h2 className="section-title">📊 나의 통계</h2>
+            <div className="stat-grid">
+              <div className="stat-card">
+                <div className="stat-value">{workouts.length}</div>
+                <div className="stat-label">총 훈련</div>
+              </div>
+              <div className="stat-card">
+                <div className="stat-value">{totalDistance.toFixed(1)}</div>
+                <div className="stat-label">총 거리 (km)</div>
+              </div>
+              <div className="stat-card">
+                <div className="stat-value">{totalTime.toFixed(0)}</div>
+                <div className="stat-label">총 시간 (분)</div>
+              </div>
+              <div className="stat-card">
+                <div className="stat-value">{(totalTime / totalDistance).toFixed(2)}</div>
+                <div className="stat-label">평균 페이스 (분/km)</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="section">
+            <h2 className="section-title">🌟 훈련 피드</h2>
+            {workouts.map(w => {
+              const date = new Date(w.date);
+              const timeAgo = Math.floor((Date.now() - date.getTime()) / (1000 * 60 * 60 * 24));
+              const timeLabel = timeAgo === 0 ? '오늘' : timeAgo === 1 ? '어제' : `${timeAgo}일 전`;
+
+              return (
+                <div key={w.id} className="feed-card">
+                  <div className="feed-header">
+                    <div className="feed-avatar">R</div>
+                    <div className="feed-user-info">
+                      <div className="feed-username">Runner</div>
+                      <div className="feed-time">{timeLabel}</div>
+                    </div>
+                  </div>
+                  <div className="feed-image">
+                    <div className="feed-stat">{w.distance}km</div>
+                    <div className="feed-stat-label">{w.time}분 러닝 완료</div>
+                  </div>
+                  <div className="feed-content">
+                    러닝 완료! 🏃‍♂️ {w.distance}km를 {w.time}분 동안 달렸습니다.
+                    <br/>평균 페이스: {(parseFloat(w.time) / parseFloat(w.distance)).toFixed(2)}분/km
+                  </div>
+                  <div>
+                    <span className="tag">#러닝</span>
+                    <span className="tag">#RunWithAI</span>
+                    <span className="tag">#운동완료</span>
+                  </div>
+                  <div className="feed-stats">
+                    <div>❤️ {Math.floor(Math.random() * 20) + 5}</div>
+                    <div>💬 {Math.floor(Math.random() * 10)}</div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
