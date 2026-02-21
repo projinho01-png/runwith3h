@@ -101,6 +101,15 @@ app.post('/api/verify-code', (req, res) => {
   res.json({ message: '인증이 완료되었습니다', verified: true });
 });
 
+// SMTP 연결 확인
+transporter.verify((error) => {
+  if (error) {
+    console.error('SMTP 연결 실패:', error.message);
+  } else {
+    console.log('SMTP 연결 성공');
+  }
+});
+
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Run With 3H 백엔드 서버 실행 중: http://localhost:${PORT}`);
   console.log(`상태 확인: http://localhost:${PORT}/health`);
