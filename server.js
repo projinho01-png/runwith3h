@@ -1,8 +1,6 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const nodemailer = require('nodemailer');
-
 const path = require('path');
 
 const app = express();
@@ -19,14 +17,29 @@ app.get('/', (req, res) => {
 // 인증 코드 저장소 (메모리)
 const verificationCodes = new Map();
 
-// Gmail SMTP 설정
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.GMAIL_USER,
-    pass: process.env.GMAIL_APP_PASSWORD
+// Resend API로 이메일 발송
+async function sendEmail(to, subject, html) {
+  const response = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      from: 'Run With 3H <onboarding@resend.dev>',
+      to: [to],
+      subject,
+      html
+    })
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || '이메일 발송 실패');
   }
-});
+
+  return response.json();
+}
 
 // 서버 상태 확인
 app.get('/health', (req, res) => {
@@ -50,11 +63,10 @@ app.post('/api/send-verification', async (req, res) => {
   });
 
   try {
-    await transporter.sendMail({
-      from: `"Run With 3H" <${process.env.GMAIL_USER}>`,
-      to: email,
-      subject: '[Run With 3H] 이메일 인증 코드',
-      html: `
+    await sendEmail(
+      email,
+      '[Run With 3H] 이메일 인증 코드',
+      `
         <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto; padding: 40px 20px;">
           <h2 style="color: #667eea;">Run With 3H 이메일 인증</h2>
           <p>아래 인증 코드를 입력해주세요:</p>
@@ -64,13 +76,13 @@ app.post('/api/send-verification', async (req, res) => {
           <p style="color: #718096; font-size: 13px;">이 코드는 10분간 유효합니다.</p>
         </div>
       `
-    });
+    );
 
     console.log(`인증 코드 발송 완료: ${email}`);
     res.json({ message: '인증 코드가 발송되었습니다' });
   } catch (error) {
-    console.error('이메일 발송 실패:', error);
-    res.status(500).json({ error: '이메일 발송에 실패했습니다. SMTP 설정을 확인해주세요.' });
+    console.error('이메일 발송 실패:', error.message);
+    res.status(500).json({ error: '이메일 발송에 실패했습니다.' });
   }
 });
 
@@ -99,15 +111,6 @@ app.post('/api/verify-code', (req, res) => {
 
   verificationCodes.delete(email);
   res.json({ message: '인증이 완료되었습니다', verified: true });
-});
-
-// SMTP 연결 확인
-transporter.verify((error) => {
-  if (error) {
-    console.error('SMTP 연결 실패:', error.message);
-  } else {
-    console.log('SMTP 연결 성공');
-  }
 });
 
 app.listen(PORT, '0.0.0.0', () => {
