@@ -82,7 +82,7 @@ app.post('/api/send-verification', async (req, res) => {
     res.json({ message: '인증 코드가 발송되었습니다' });
   } catch (error) {
     console.error('이메일 발송 실패:', error.message);
-    res.status(500).json({ error: '이메일 발송에 실패했습니다.' });
+    res.status(500).json({ error: '이메일 발송에 실패했습니다.', detail: error.message });
   }
 });
 
